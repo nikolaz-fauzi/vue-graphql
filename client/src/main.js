@@ -11,7 +11,7 @@ Vue.use(VueApollo);
 
 // Setup ApolloClient
 // with or without /graphql is ok
-const defaultClient = new ApolloClient({
+export const defaultClient = new ApolloClient({
   uri: 'http://localhost:4001/graphql'
 });
 
