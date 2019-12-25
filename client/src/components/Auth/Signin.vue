@@ -6,6 +6,13 @@
         <h3>Welcome Back!</h3>
       </v-flex>
     </v-layout>
+    <!-- Error alert -->
+    <v-layout v-if="error" row wrap>
+      <v-flex xs12 sm6 offset-sm3>
+        <form-alert :message="error.message">
+        </form-alert>
+      </v-flex>
+    </v-layout>
     <!-- Form -->
     <v-layout row wrap>
       <v-flex xs12 sm6 offset-sm3>
@@ -59,6 +66,22 @@ export default {
       username: '',
       password: ''
     };
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+    error() {
+      return this.$store.getters.error;
+    }
+  },
+  watch: {
+    user(value) {
+      // if user value changes(not null), redirect to home page
+      if (value) {
+        this.$router.push('/');
+      }
+    }
   },
   methods: {
     handleSigninUser() {

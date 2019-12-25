@@ -19,6 +19,13 @@
           </v-list-item-action>
           <v-list-item-content>{{ item.title }}</v-list-item-content>
         </v-list-item>
+        <!-- Signout button -->
+        <v-list-item ripple v-if="user" @click="handleSignoutUser">
+          <v-list-item-action>
+            <v-icon>exit_to_app</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>Signout</v-list-item-content>
+        </v-list-item>
       </div>
     </v-navigation-drawer>
 
@@ -53,6 +60,21 @@
             <v-icon class="hidden-sm-only" left>{{ item.icon }}</v-icon>
             {{item.title}}
           </v-btn>
+
+          <!-- Profile button -->
+          <v-btn text to="/profile" v-if="user">
+            <v-icon class="hidden-sm-only" left>account_box</v-icon>
+            <v-badge right color="blue darken-2">
+              <!-- <span slot="badge">1</span> -->
+              Profile
+            </v-badge>
+          </v-btn>
+
+          <!-- Signout button -->
+          <v-btn text to="/profile" v-if="user" @click="handleSignoutUser">
+            <v-icon class="hidden-sm-only" left>exit_to_app</v-icon>
+            Signout
+          </v-btn>
         </v-toolbar-items>
       </v-toolbar>
     </v-card>
@@ -77,24 +99,49 @@ export default {
   },
   computed: {
     horizontalNavItems() {
-      return [
+      let items = [
         { icon: "search", title: "Posts", link: "/posts" },
         { icon: "lock_open", title: "Sign In", link: "/signin" },
-        { icon: "create", title: "Sign Un", link: "/signup" }
+        { icon: "create", title: "Sign Up", link: "/signup" }
       ];
+      if (this.user) {
+        items = [
+          { icon: "chat", title: "Posts", link: "/posts" },
+        ]
+      }
+      return items;
     },
     sideNavItems() {
-      return [
+      let items = [
         { icon: "search", title: "Posts", link: "/posts" },
         { icon: "lock_open", title: "Sign In", link: "/signin" },
-        { icon: "create", title: "Sign Un", link: "/signup" }
+        { icon: "create", title: "Sign Up", link: "/signup" }
       ];
+      if (this.user) {
+        items = [
+          { icon: "chat", title: "Posts", link: "/posts" },
+          { icon: "stars", title: "Create Post", link: "/post/add" },
+          { icon: "account_box", title: "Profile", link: "/profile" },
+        ]
+      }
+      return items;
+    },
+    user() {
+      return this.$store.getters.user;
+    }
+  },
+  methods: {
+    handleSignoutUser() {
+      this.$store.dispatch('signoutUser');
     }
   }
 };
 </script>
 
 <style lang="scss">
+.v-carousel__controls {
+  background: none !important;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition-property: all; //using opacity if fade only

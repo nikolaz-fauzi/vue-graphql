@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import router from '../router';
 
 import {
   defaultClient as apolloClient
@@ -16,15 +17,25 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     posts: [],
-    loading: false
+    user: null,
+    loading: false,
+    error: null
   },
   mutations: {
     setPosts: (state, payload) => {
       state.posts = payload;
     },
+    setUser: (state, payload) => {
+      state.user = payload;
+    },
     setLoading: (state, payload) => {
       state.loading = payload;
-    }
+    },
+    setError: (state, payload) => {
+      state.error = payload;
+    },
+    clearUser: state => state.user = null,
+    clearError: state => state.error = null
   },
   actions: {
     getCurrentUser: ({ commit }) => {
@@ -33,8 +44,10 @@ export default new Vuex.Store({
         query: GET_CURRENT_USER
       })
       .then(({ data }) => {
-        console.log(data);
         commit('setLoading', false);
+        // Add user data to state
+        commit('setUser', data.getCurrentUser);
+        console.log(data.getCurrentUser);
       })
       .catch((err) => {
         console.log(err);
@@ -69,18 +82,38 @@ export default new Vuex.Store({
     signinUser: ({
       commit
     }, payload) => {
+      localStorage.setItem('token', '');
+      commit('clearError');
       apolloClient.mutate({
         variables: payload,
         mutation: SIGNIN_USER
       })
       .then(({data}) => {
         localStorage.setItem('token', data.signinUser.token);
+        // to make sure created method is run in main.js
+        // we run getCurrentUser, reload the page
+        router.go();
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        commit('setError', err);
+        console.log(err)
+      });
+    },
+    signoutUser: async ({commit}) => {
+      // clear user in state
+      commit('clearUser');
+      // remove token in LocalStorage, can use remove or set to ''
+      localStorage.setItem('token', '');
+      // end session
+      await apolloClient.resetStore();
+      // redirect home - kick user out of private page
+      router.push('/');
     }
   },
   getters: {
     posts: state => state.posts,
-    loading: state => state.loading
+    loading: state => state.loading,
+    user: state => state.user,
+    error: state => state.error
   }
 })
