@@ -84,11 +84,13 @@ export default new Vuex.Store({
     }, payload) => {
       localStorage.setItem('token', '');
       commit('clearError');
+      commit('setLoading', true);
       apolloClient.mutate({
         variables: payload,
         mutation: SIGNIN_USER
       })
       .then(({data}) => {
+        commit('setLoading', false);
         localStorage.setItem('token', data.signinUser.token);
         // to make sure created method is run in main.js
         // we run getCurrentUser, reload the page
@@ -96,6 +98,7 @@ export default new Vuex.Store({
       })
       .catch(err => {
         commit('setError', err);
+        commit('setLoading', false);
         console.log(err)
       });
     },
