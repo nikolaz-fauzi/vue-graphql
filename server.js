@@ -32,9 +32,16 @@ const getUser = async token => {
 }
 
 // create apollo/graphQL server using typedefs, resolver, context
+// formarError for formating the error object to name + message
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  formatError: (error) => {
+    return {
+      name: error.name,
+      message: error.message.replace('Context creation failed:', '')
+    }
+  },
   context: async ({ req }) => {
     const token = req.headers["authorization"];
     return {

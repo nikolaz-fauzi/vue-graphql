@@ -91,6 +91,13 @@
           <h3>You are now signed in!</h3>
           <v-btn dark text @click="authSnackbar = false">Close</v-btn>
         </v-snackbar>
+
+        <!-- Auth Error Snackbar -->
+        <v-snackbar v-if="authError" v-model="authErrorSnackbar" :timeout="5000" color="warning" bottom left>
+          <v-icon class="mr-3">cancel</v-icon>
+          <h3>{{ authError.message }}</h3>
+          <v-btn dark text to="/signin">Signin</v-btn>
+        </v-snackbar>
       </div>
     </main>
   </v-app>
@@ -102,7 +109,8 @@ export default {
   data() {
     return {
       sideNav: false,
-      authSnackbar: false
+      authSnackbar: false,
+      authErrorSnackbar: false
     };
   },
   watch: {
@@ -110,6 +118,12 @@ export default {
       // if we had no value for user before, show snackbar
       if (!oldValue) {
         this.authSnackbar = true;
+      }
+    },
+    authError(value) {
+      // if auth error not full, show auth error snackbar
+      if (value !== null) {
+        this.authErrorSnackbar = true;
       }
     }
   },
@@ -144,6 +158,9 @@ export default {
     },
     user() {
       return this.$store.getters.user;
+    },
+    authError() {
+      return this.$store.getters.authError;
     }
   },
   methods: {

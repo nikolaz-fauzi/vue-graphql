@@ -9,8 +9,7 @@
     <!-- Error alert -->
     <v-layout v-if="error" row wrap>
       <v-flex xs12 sm6 offset-sm3>
-        <form-alert :message="error.message">
-        </form-alert>
+        <form-alert :message="error.message"></form-alert>
       </v-flex>
     </v-layout>
     <!-- Form -->
@@ -18,7 +17,12 @@
       <v-flex xs12 sm6 offset-sm3>
         <v-card color="secondary" dark>
           <v-container>
-            <v-form v-model="isFormValid" ref="form" lazy-validation @submit.prevent="handleSigninUser">
+            <v-form
+              v-model="isFormValid"
+              ref="form"
+              lazy-validation
+              @submit.prevent="handleSigninUser"
+            >
               <v-layout row>
                 <v-flex xs12>
                   <v-text-field
@@ -45,9 +49,12 @@
               </v-layout>
               <v-layout row>
                 <v-flex xs12>
-                  <v-btn :disabled="!isFormValid" color="accent" type="submit" :loading="loading">
-                    Signin
-                  </v-btn>
+                  <v-btn
+                    :disabled="!isFormValid"
+                    color="accent"
+                    type="submit"
+                    :loading="loading || loading"
+                  >Signin</v-btn>
                   <h3>
                     Don't have an account?
                     <router-link to="/signup">Signup</router-link>
@@ -68,18 +75,20 @@ export default {
   data() {
     return {
       isFormValid: true,
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       usernameRules: [
         // Check if username in input
-        username => !!username || 'Username is required',
+        username => !!username || "Username is required",
         // Mase sure username is less than 10 characters
-        username => username.length < 10 || 'Username must be less than 10 characters'
+        username =>
+          username.length < 10 || "Username must be less than 10 characters"
       ],
       passwordRules: [
-        password => !!password || 'Password is required',
+        password => !!password || "Password is required",
         // Make sure password is at least 7 characters
-        password => password.length >= 4 || 'Password must be at least 4 characters'
+        password =>
+          password.length >= 4 || "Password must be at least 4 characters"
       ]
     };
   },
@@ -98,17 +107,17 @@ export default {
     user(value) {
       // if user value changes(not null), redirect to home page
       if (value) {
-        this.$router.push('/');
+        this.$router.push("/");
       }
     }
   },
   methods: {
     handleSigninUser() {
       if (this.$refs.form.validate()) {
-        this.$store.dispatch('signinUser', {
+        this.$store.dispatch("signinUser", {
           username: this.username,
           password: this.password
-        })
+        });
       }
     }
   }

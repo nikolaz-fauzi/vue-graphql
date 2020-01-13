@@ -9,6 +9,7 @@ import {
 import {
   GET_POSTS,
   SIGNIN_USER,
+  SIGNUP_USER,
   GET_CURRENT_USER
 } from '../queries';
 
@@ -19,7 +20,8 @@ export default new Vuex.Store({
     posts: [],
     user: null,
     loading: false,
-    error: null
+    error: null,
+    authError: null
   },
   mutations: {
     setPosts: (state, payload) => {
@@ -33,6 +35,9 @@ export default new Vuex.Store({
     },
     setError: (state, payload) => {
       state.error = payload;
+    },
+    setAuthError: (state, payload) => {
+      state.authError = payload;
     },
     clearUser: state => state.user = null,
     clearError: state => state.error = null
@@ -102,6 +107,29 @@ export default new Vuex.Store({
         console.log(err)
       });
     },
+    signupUser: ({
+      commit
+    }, payload) => {
+      localStorage.setItem('token', '');
+      commit('clearError');
+      commit('setLoading', true);
+      apolloClient.mutate({
+        variables: payload,
+        mutation: SIGNUP_USER
+      })
+      .then(({data}) => {
+        commit('setLoading', false);
+        localStorage.setItem('token', data.signupUser.token);
+        // to make sure created method is run in main.js
+        // we run getCurrentUser, reload the page
+        router.go();
+      })
+      .catch(err => {
+        commit('setError', err);
+        commit('setLoading', false);
+        console.log(err)
+      });
+    },
     signoutUser: async ({commit}) => {
       // clear user in state
       commit('clearUser');
@@ -117,6 +145,7 @@ export default new Vuex.Store({
     posts: state => state.posts,
     loading: state => state.loading,
     user: state => state.user,
-    error: state => state.error
+    error: state => state.error,
+    authError: state => state.authError
   }
 })
