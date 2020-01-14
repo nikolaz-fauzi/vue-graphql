@@ -10,7 +10,12 @@
     <!-- Add Post Form -->
     <v-layout row wrap>
       <v-flex xs12 sm6 offset-sm3>
-        <v-form v-model="isFormValid" ref="form" lazy-validation @submit.prevent="handleAddPost">
+        <v-form
+          v-model="isFormValid"
+          ref="form"
+          lazy-validation
+          @submit.prevent="handleAddPost"
+        >
           <v-layout row>
             <v-flex xs12>
               <v-text-field
@@ -47,7 +52,14 @@
               <v-select
                 :rules="categoriesRules"
                 v-model="categories"
-                :items="['Art', 'Education', 'Travel', 'Photography']"
+                :items="[
+                  'Art',
+                  'Education',
+                  'Travel',
+                  'Photography',
+                  'Food',
+                  'Furniture'
+                ]"
                 multiple
                 label="Categories"
               ></v-select>
@@ -73,7 +85,8 @@
                 color="accent"
                 type="submit"
                 :loading="loading"
-              >Submit</v-btn>
+                >Submit</v-btn
+              >
             </v-flex>
           </v-layout>
         </v-form>
@@ -110,15 +123,24 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["loading"])
+    ...mapGetters(["loading", "user"])
   },
   methods: {
     handleAddPost() {
-      
+      if (this.$refs.form.validate()) {
+        // add post action
+        this.$store.dispatch("addPost", {
+          title: this.title,
+          imageUrl: this.imageUrl,
+          categories: this.categories,
+          description: this.description,
+          creatorId: this.user._id
+        });
+        this.$router.push("/");
+      }
     }
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>
