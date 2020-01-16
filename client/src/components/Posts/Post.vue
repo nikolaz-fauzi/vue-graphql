@@ -52,15 +52,23 @@
       <!-- Message Input -->
       <v-layout class="mb-3" v-if="user">
         <v-flex xs12>
-          <v-form>
+          <v-form
+            ref="form"
+            v-model="isFormValid"
+            lazy-validation
+            @submit.prevent="handleAddPostMessage"
+          >
             <v-layout row>
               <v-flex xs12>
                 <v-text-field
+                  :rules="messageRules"
                   clearable
-                  append-outer-icon="send"
+                  v-model="messageBody"
+                  :append-outer-icon="messageBody && 'send'"
                   label="Add Message"
                   type="text"
                   prepend-icon="email"
+                  @click:append-outer="handleAddPostMessage"
                   required
                 ></v-text-field>
               </v-flex>
@@ -78,30 +86,36 @@
                     <v-divider :key="message._id"></v-divider>
                     <v-list-item :key="message.title">
                       <v-list-item-icon>
-                        <v-icon v-if="item.icon" color="pink">mdi-star</v-icon>
+                        <v-img :src="message.messageUser.avatar"></v-img>
                       </v-list-item-icon>
 
                       <v-list-item-content>
-                        <v-list-item-title v-text="item.title">
+                        <v-list-item-title>
                           {{ message.messageBody }}
                         </v-list-item-title>
                         <v-list-item-subtitle>
-                          {{ message.messageUser.username }}
-                          <span class="grey--text text-lighten-1 hidden-xs-only">
-                            {{message.messageDate}}
+                          <b>{{ message.messageUser.username }}</b>
+                          <span
+                            class="grey--text text-lighten-1 hidden-xs-only"
+                          >
+                            {{ message.messageDate }}
                           </span>
                         </v-list-item-subtitle>
                       </v-list-item-content>
 
                       <v-list-item-action class="hidden-xs-only">
-                        <v-icon color="grey">chat_bubble</v-icon>
+                        <v-icon
+                          :color="
+                            checkIfOwnMessage(message) ? 'accent' : 'grey'
+                          "
+                          >chat_bubble</v-icon
+                        >
                       </v-list-item-action>
 
                       <v-list-item-avatar>
                         <v-img :src="message.avatar"></v-img>
                       </v-list-item-avatar>
                     </v-list-item>
-                    v-list
                   </template>
                 </v-list>
               </v-flex>
@@ -114,7 +128,7 @@
 </template>
 
 <script>
-import { GET_POST } from "../../queries";
+import { GET_POST, ADD_POST_MESSAGE } from "../../queries";
 import { mapGetters } from "vuex";
 export default {
   name: "Post",
@@ -125,7 +139,14 @@ export default {
   },
   data() {
     return {
-      dialog: false
+      dialog: false,
+      messageBody: "",
+      isFormValid: true,
+      messageRules: [
+        message => !!message || "Message is Required",
+        message =>
+          message.length < 50 || "Message must be less than 50 characters"
+      ]
     };
   },
   apollo: {
@@ -150,6 +171,48 @@ export default {
       if (window.innerWidth > 500) {
         this.dialog = !this.dialog;
       }
+    },
+    handleAddPostMessage() {
+      if (this.$refs.form.validate()) {
+        const variables = {
+          messageBody: this.messageBody,
+          userId: this.user._id,
+          postId: this.postId
+        };
+        this.$apollo
+          .mutate({
+            mutation: ADD_POST_MESSAGE,
+            variables,
+            // update automaticly without refresh
+            update: (cache, { data: { addPostMessage } }) => {
+              // find all data
+              const data = cache.readQuery({
+                query: GET_POST,
+                variables: {
+                  postId: this.postId
+                }
+              });
+              // add new data to first in existing data, temp
+              data.getPost.messages.unshift(addPostMessage);
+              // add back to our graphql
+              cache.writeQuery({
+                query: GET_POST,
+                variables: {
+                  postId: this.postId
+                },
+                data
+              });
+            }
+          })
+          .then(({ data }) => {
+            this.$refs.form.reset();
+            console.log(data.addPostMessage);
+          })
+          .catch(err => console.error(err));
+      }
+    },
+    checkIfOwnMessage(message) {
+      return this.user && this.user._id === message.messageUser._id;
     }
   },
   watch: {

@@ -43,8 +43,16 @@ type Query {
   infiniteScrollPosts(pageNum: Int!, pageSize: Int!): PostsPage
 }
 
+type LikesFaves {
+  likes: Int
+  favorites: [Post]
+}
+
 type Mutation {
   signinUser(username: String!, password: String!): Token!
   signupUser(username: String!, email: String!, password: String!): Token!
   addPost(title: String!, imageUrl: String!, categories: [String]!, description: String!, creatorId: ID!): Post!
+  addPostMessage(messageBody: String!, userId: ID!, postId: ID!): Message!
+  likePost(postId: ID!, username: String!): LikesFaves!
+  unlikePost(postId: ID!, username: String!): LikesFaves!
 }
