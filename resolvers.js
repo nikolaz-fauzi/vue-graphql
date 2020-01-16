@@ -19,6 +19,13 @@ module.exports = {
       });
       return user;
     },
+    getPost: async (_, { postId }, { Post }) => {
+      const post = await Post.findOne({ _id: postId }).populate({
+        path: 'messages.messageUser', // path in Post model
+        model: 'User' // ref
+      });
+      return post;
+    },
     getPosts: async (_, args, { Post }) => {
       const posts = await Post.find({}).sort({ createdDate: 'desc'}).populate({
         path: 'createdBy',
