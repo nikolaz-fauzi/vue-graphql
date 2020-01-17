@@ -91,13 +91,14 @@ module.exports = {
       return post.messages[0];
     },
     likePost: async (_, { postId, username }, { Post, User }) => {
-      // Find Post, add 1 to its 'like' value
+      // Find Post, add 1 to its 'likes' value to DB
       const post = await Post.findOneAndUpdate(
         { _id: postId },
         { $inc: { likes: 1 } },
         { new: true } // return updated value imediately
       );
       // Find user, add id of post to its favorites array (which will be populates as posts)
+      // add to favorites in user
       const user = await User.findOneAndUpdate(
         { username },
         { $addToSet: { favorites: postId } },
@@ -113,16 +114,17 @@ module.exports = {
       }
     },
     unlikePost: async (_, { postId, username }, { Post, User }) => {
-      // Find Post, add -1 to its 'like' value
+      // Find Post, add -1 to its 'like' value to DB
       const post = await Post.findOneAndUpdate(
         { _id: postId },
         { $inc: { likes: -1 } },
         { new: true } // return updated value imediately
       );
       // Find user, remove id of post from its favorites array (which will be populates as posts)
+      // remove favorites array in db
       const user = await User.findOneAndUpdate(
         { username },
-        { $addToSet: { favorites: postId } },
+        { $pull: { favorites: postId } },
         { new: true }
       ).populate({
         path: 'favorites',
