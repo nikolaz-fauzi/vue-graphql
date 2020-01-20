@@ -44,6 +44,8 @@
 
         <!-- Search Input -->
         <v-text-field
+          v-model="searchTerm"
+          @input="handleSearchPosts"
           flex
           prepend-icon="search"
           placeholder="Search posts"
@@ -51,6 +53,16 @@
           single-line
           hide-details
         ></v-text-field>
+
+        <!-- Search results card -->
+        <v-card dark v-if="searchResults.length" id="search__card">
+          <v-list-item-content v-for="result in searchResults" :key="result._id">
+            <v-list-item-title class="text--primary">
+              {{ result.title }}
+              <span class="font-weight-thin">{{ result.description }}</span>
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-card>
 
         <v-spacer></v-spacer>
 
@@ -111,7 +123,8 @@ export default {
       sideNav: false,
       authSnackbar: false,
       authErrorSnackbar: false,
-      badgeAnimated: false
+      badgeAnimated: false,
+      searchTerm: ''
     };
   },
   watch: {
@@ -169,6 +182,9 @@ export default {
     user() {
       return this.$store.getters.user;
     },
+    searchResults() {
+      return this.$store.getters.searchResults;
+    },
     authError() {
       return this.$store.getters.authError;
     },
@@ -179,6 +195,11 @@ export default {
   methods: {
     handleSignoutUser() {
       this.$store.dispatch('signoutUser');
+    },
+    handleSearchPosts() {
+      this.$store.dispatch('searchPosts', {
+        searchTerm: this.searchTerm
+      });
     }
   }
 };
@@ -203,6 +224,15 @@ export default {
 .fade-leave-active {
   opacity: 0;
   transform: translateX(-25px); // not using this if fade only
+}
+
+// Search results card
+#search__card {
+  position: absolute;
+  width: 100vw;
+  z-index: 8;
+  top: 100%;
+  left: 0%;
 }
 
 // User favorites animation
