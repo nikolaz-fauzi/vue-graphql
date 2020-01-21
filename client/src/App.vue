@@ -13,7 +13,12 @@
 
       <!-- Side Navbar Links -->
       <div>
-        <v-list-item ripple v-for="item in sideNavItems" :key="item.title" :to="item.link">
+        <v-list-item
+          ripple
+          v-for="item in sideNavItems"
+          :key="item.title"
+          :to="item.link"
+        >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -30,13 +35,15 @@
     </v-navigation-drawer>
 
     <!-- Horizontal Navbar -->
-    <v-card color="grey lighten-4" flat>
+    <v-card color="grey lighten-4" flat style="position: relative; z-index: 10">
       <v-toolbar fixed color="primary" dark>
         <!-- App Title -->
         <v-app-bar-nav-icon @click="sideNav = !sideNav"></v-app-bar-nav-icon>
         <v-toolbar-title class="hidden-xs-only">
           <v-toolbar-title>
-            <router-link to="/" tag="span" style="cursor: pointer">VueShare</router-link>
+            <router-link to="/" tag="span" style="cursor: pointer"
+              >VueShare</router-link
+            >
           </v-toolbar-title>
         </v-toolbar-title>
 
@@ -55,29 +62,48 @@
         ></v-text-field>
 
         <!-- Search results card -->
-        <v-card dark v-if="searchResults.length" id="search__card">
-          <v-list-item-content v-for="result in searchResults" :key="result._id">
-            <v-list-item-title class="text--primary">
-              {{ result.title }}
-              <span class="font-weight-thin">{{ result.description }}</span>
-            </v-list-item-title>
-          </v-list-item-content>
+        <v-card light v-if="searchResults.length" id="search__card">
+          <v-card-text
+            @click="goToSearchResult(result._id)"
+            v-for="result in searchResults"
+            :key="result._id"
+          >
+            <div class="text--primary" style="display: inline">
+              {{ result.title }} -
+              <span class="font-weight-thin">{{ formatDescription(result.description) }}</span>
+            </div>
+            <!-- Show icon if result favorited by user -->
+            <span v-if="checkIfUserFavorite(result._id)">
+              <v-icon>favorite</v-icon>
+            </span>
+          </v-card-text>
         </v-card>
 
         <v-spacer></v-spacer>
 
         <!-- Horizontal navbar links -->
         <v-toolbar-items class="hidden-xs-only">
-          <v-btn text v-for="item in horizontalNavItems" :key="item.title" :to="item.link">
+          <v-btn
+            text
+            v-for="item in horizontalNavItems"
+            :key="item.title"
+            :to="item.link"
+          >
             <v-icon class="hidden-sm-only" left>{{ item.icon }}</v-icon>
-            {{item.title}}
+            {{ item.title }}
           </v-btn>
 
           <!-- Profile button -->
           <v-btn text to="/profile" v-if="user">
             <v-icon class="hidden-sm-only" left>account_box</v-icon>
-            <v-badge right color="blue darken-2" :class="{'bounce': badgeAnimated}">
-              <span slot="badge" v-if="!!userFavorites.length">{{ userFavorites.length }}</span>
+            <v-badge
+              right
+              color="blue darken-2"
+              :class="{ bounce: badgeAnimated }"
+            >
+              <span slot="badge" v-if="!!userFavorites.length">{{
+                userFavorites.length
+              }}</span>
               Profile
             </v-badge>
           </v-btn>
@@ -98,14 +124,27 @@
         </transition>
 
         <!-- Auth Snackbar -->
-        <v-snackbar v-model="authSnackbar" :timeout="5000" color="success" bottom left>
+        <v-snackbar
+          v-model="authSnackbar"
+          :timeout="5000"
+          color="success"
+          bottom
+          left
+        >
           <v-icon class="mr-3">check_circle</v-icon>
           <h3>You are now signed in!</h3>
           <v-btn dark text @click="authSnackbar = false">Close</v-btn>
         </v-snackbar>
 
         <!-- Auth Error Snackbar -->
-        <v-snackbar v-if="authError" v-model="authErrorSnackbar" :timeout="5000" color="warning" bottom left>
+        <v-snackbar
+          v-if="authError"
+          v-model="authErrorSnackbar"
+          :timeout="5000"
+          color="warning"
+          bottom
+          left
+        >
           <v-icon class="mr-3">cancel</v-icon>
           <h3>{{ authError.message }}</h3>
           <v-btn dark text to="/signin">Signin</v-btn>
@@ -124,7 +163,7 @@ export default {
       authSnackbar: false,
       authErrorSnackbar: false,
       badgeAnimated: false,
-      searchTerm: ''
+      searchTerm: ""
     };
   },
   watch: {
@@ -145,7 +184,7 @@ export default {
       if (value) {
         this.badgeAnimated = true;
         setTimeout(() => {
-          this.badgeAnimated = false
+          this.badgeAnimated = false;
         }, 1000);
       }
     }
@@ -158,9 +197,7 @@ export default {
         { icon: "create", title: "Sign Up", link: "/signup" }
       ];
       if (this.user) {
-        items = [
-          { icon: "chat", title: "Posts", link: "/posts" },
-        ]
+        items = [{ icon: "chat", title: "Posts", link: "/posts" }];
       }
       return items;
     },
@@ -174,8 +211,8 @@ export default {
         items = [
           { icon: "chat", title: "Posts", link: "/posts" },
           { icon: "stars", title: "Create Post", link: "/post/add" },
-          { icon: "account_box", title: "Profile", link: "/profile" },
-        ]
+          { icon: "account_box", title: "Profile", link: "/profile" }
+        ];
       }
       return items;
     },
@@ -194,12 +231,26 @@ export default {
   },
   methods: {
     handleSignoutUser() {
-      this.$store.dispatch('signoutUser');
+      this.$store.dispatch("signoutUser");
+    },
+    goToSearchResult(resultId) {
+      // clear search term
+      this.searchTerm = '';
+      // Go to desired result page post
+      this.$router.push(`/posts/${resultId}`);
+      // Clear search results in state
+      this.$store.commit('clearSearchResults');
+    },
+    formatDescription(desc) {
+      return desc.length > 20 ? `${desc.slice(0, 20)}...` : desc;
     },
     handleSearchPosts() {
-      this.$store.dispatch('searchPosts', {
+      this.$store.dispatch("searchPosts", {
         searchTerm: this.searchTerm
       });
+    },
+    checkIfUserFavorite(resultId) {
+      return this.userFavorites && this.userFavorites.some(fave => fave._id === resultId);
     }
   }
 };
@@ -233,6 +284,7 @@ export default {
   z-index: 8;
   top: 100%;
   left: 0%;
+  cursor: pointer;
 }
 
 // User favorites animation
@@ -241,10 +293,15 @@ export default {
 }
 
 @keyframes bounce {
-  0%, 20%, 53%, 80%, 100% {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
     transform: translate3d(0, 0, 0);
   }
-  40%, 43% {
+  40%,
+  43% {
     transform: translate3d(0, -20px, 0);
   }
   70% {

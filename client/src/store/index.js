@@ -47,6 +47,9 @@ export default new Vuex.Store({
     setAuthError: (state, payload) => {
       state.authError = payload;
     },
+    clearSearchResults: (state) => {
+      state.searchResults = [];
+    },
     clearUser: state => state.user = null,
     clearError: state => state.error = null
   },
