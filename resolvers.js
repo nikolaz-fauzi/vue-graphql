@@ -19,6 +19,12 @@ module.exports = {
       });
       return user;
     },
+    getUserPosts: async (_, { userId }, { Post }) => {
+      const posts = await Post.find({
+        createdBy: userId
+      });
+      return posts;
+    },
     getPost: async (_, { postId }, { Post }) => {
       const post = await Post.findOne({ _id: postId }).populate({
         path: 'messages.messageUser', // path in Post model

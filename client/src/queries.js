@@ -13,6 +13,20 @@ export const GET_POSTS = gql`
   }
 `;
 
+export const GET_USER_POSTS = gql`
+  query($userId: ID!) {
+    getUserPosts(userId: $userId) {
+      _id
+      title
+      imageUrl
+      description
+      categories
+      createdDate
+      likes
+    }
+  }
+`
+
 export const GET_POST = gql`
   query($postId: ID!) {
     getPost(postId: $postId) {
