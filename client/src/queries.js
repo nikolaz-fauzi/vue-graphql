@@ -1,6 +1,4 @@
-import {
-  gql
-} from 'apollo-boost';
+import { gql } from "apollo-boost";
 
 // Posts Queries
 export const GET_POSTS = gql`
@@ -25,7 +23,7 @@ export const GET_USER_POSTS = gql`
       likes
     }
   }
-`
+`;
 
 export const GET_POST = gql`
   query($postId: ID!) {
@@ -49,7 +47,7 @@ export const GET_POST = gql`
       }
     }
   }
-`
+`;
 
 export const INFINITE_SCROLL_POSTS = gql`
   query($pageNum: Int!, $pageSize: Int!) {
@@ -74,7 +72,7 @@ export const INFINITE_SCROLL_POSTS = gql`
       }
     }
   }
-`
+`;
 
 export const SEARCH_POSTS = gql`
   query($searchTerm: String) {
@@ -86,7 +84,7 @@ export const SEARCH_POSTS = gql`
       likes
     }
   }
-`
+`;
 
 // User Queries
 export const GET_CURRENT_USER = gql`
@@ -105,36 +103,57 @@ export const GET_CURRENT_USER = gql`
       }
     }
   }
-`
+`;
 // Posts Mutations
 
 export const ADD_POST = gql`
-mutation(
-  $title: String!,
-  $imageUrl: String!,
-  $categories: [String]!,
-  $description: String!,
-  $creatorId: ID!
-) {
-  addPost(
-    title: $title,
-    imageUrl: $imageUrl,
-    categories: $categories,
-    description: $description,
-    creatorId: $creatorId
+  mutation(
+    $title: String!
+    $imageUrl: String!
+    $categories: [String]!
+    $description: String!
+    $creatorId: ID!
   ) {
-    _id
-    title
-    imageUrl
-    categories
-    description
+    addPost(
+      title: $title
+      imageUrl: $imageUrl
+      categories: $categories
+      description: $description
+      creatorId: $creatorId
+    ) {
+      _id
+      title
+      imageUrl
+      categories
+      description
+    }
   }
-}
-`
+`;
+export const UPDATE_USER_POST = gql`
+  mutation($postId: ID!, $userId: ID!, $title: String!, $imageUrl: String!, $categories: [String]!, $description: String!) {
+    updateUserPost(postId: $postId, userId: $userId, title: $title, imageUrl: $imageUrl, categories: $categories, description: $description) {
+      _id
+      title
+      imageUrl
+      description
+      categories
+      createdDate
+      likes
+      createdBy {
+        _id
+        avatar
+      }
+    }
+  }
+`;
 
 export const ADD_POST_MESSAGE = gql`
   mutation($messageBody: String!, $userId: ID!, $postId: ID!) {
-    addPostMessage(messageBody: $messageBody, userId: $userId, postId: $postId) {
+    addPostMessage(
+      messageBody: $messageBody
+      userId: $userId
+      postId: $postId
+    ) {
       _id
       messageBody
       messageDate
@@ -145,7 +164,7 @@ export const ADD_POST_MESSAGE = gql`
       }
     }
   }
-`
+`;
 
 export const LIKE_POST = gql`
   mutation($postId: ID!, $username: String!) {
@@ -158,7 +177,7 @@ export const LIKE_POST = gql`
       }
     }
   }
-`
+`;
 
 export const UNLIKE_POST = gql`
   mutation($postId: ID!, $username: String!) {
@@ -171,7 +190,7 @@ export const UNLIKE_POST = gql`
       }
     }
   }
-`
+`;
 
 // User Mutations
 export const SIGNIN_USER = gql`
@@ -184,7 +203,7 @@ export const SIGNIN_USER = gql`
 
 export const SIGNUP_USER = gql`
   mutation($username: String!, $email: String!, $password: String!) {
-    signupUser(username:$username, email:$email, password:$password) {
+    signupUser(username: $username, email: $email, password: $password) {
       token
     }
   }
