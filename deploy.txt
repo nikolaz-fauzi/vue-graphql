@@ -1,0 +1,5 @@
+-) regis zeit
+-) add PORT env for server listen in server.js (port: 80) // common port deployment
+-) npm i -g now
+-) now --dotenv=variables.env // specify env file
+-) run 'now' // ver = 11.3.10

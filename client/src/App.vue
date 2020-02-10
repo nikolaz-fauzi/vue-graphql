@@ -257,6 +257,14 @@ export default {
 </script>
 
 <style lang="scss">
+h1 {
+  font-weight: 400;
+  font-size: 2.5rem;
+}
+h2 {
+  font-weight: 400;
+  font-size: 2rem;
+}
 .v-carousel__controls {
   background: none !important;
 }

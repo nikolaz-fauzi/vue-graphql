@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Home</h1>
+    <!-- Loading spinner -->
     <v-layout>
       <v-dialog v-model="loading" persistent fullscreen>
         <v-container fill-height>
@@ -11,6 +11,17 @@
         </v-container>
       </v-dialog>
     </v-layout>
+
+    <!-- Export posts buttons -->
+    <v-layout class="mt-2 mb-3" row wrap v-if="!loading">
+      <v-flex xs12 style="text-align: center">
+        <v-btn class="secondary" to="/posts" large dark>
+          Explore Posts
+        </v-btn>
+      </v-flex>
+    </v-layout>
+
+  <!-- Posts Carousel -->
     <v-flex xs12>
       <v-carousel v-if="!loading && posts.length > 0" v-bind="{'cycle': true}" interval="3000">
         <v-carousel-item @click.native="goToPost(post._id)" v-for="post in posts" :key="post._id" :src="post.imageUrl">
@@ -52,6 +63,7 @@ export default {
 
 <style lang="scss">
 #carousel__title {
+  cursor: pointer;
   position: absolute;
   background-color: rgba(0, 0, 0, 0.2);
   color: white;

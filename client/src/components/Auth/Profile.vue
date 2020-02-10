@@ -11,7 +11,7 @@
             <v-card-title primary-title>
               <div>
                 <div class="headline">{{ user.username }}</div>
-                <div>Joined {{ user.joinDate }}</div>
+                <div>Joined {{ formatJoinDate(user.joinDate) }}</div>
                 <div class="hidden-xs-only font-weight-thin">
                   {{ user.favorites.length }} Favorites
                 </div>
@@ -43,7 +43,7 @@
       <v-layout row wrap>
         <v-flex xs12 sm6 v-for="favorite in userFavorites" :key="favorite._id">
           <v-card class="mt-3 ml-1 mr-2" hover>
-            <v-img height="30vh" :src="favorite.imageUrl"></v-img>
+            <v-img @click="goToPost(favorite._id)" height="30vh" :src="favorite.imageUrl"></v-img>
             <v-card-text>{{ favorite.title }}</v-card-text>
           </v-card>
         </v-flex>
@@ -65,15 +65,15 @@
         </h2>
       </v-flex>
       <v-layout row wrap>
-        <v-flex xs12 sm6 v-for="post in userPosts" :key="post._id">
+        <v-flex style="text-align: center" xs12 sm6 v-for="post in userPosts" :key="post._id">
           <v-card class="mt-3 ml-1 mr-2" hover>
-            <v-btn @click="loadPost(post)" color="info" floating fab small dark>
+            <v-btn style="margin-top: 7px; margin-bottom: 7px" @click="loadPost(post)" color="info" floating fab small dark>
               <v-icon>edit</v-icon>
             </v-btn>
             <v-btn @click="handleDeleteUserPost(post)" color="error" floating fab small dark>
               <v-icon>delete</v-icon>
             </v-btn>
-            <v-img height="30vh" :src="post.imageUrl"></v-img>
+            <v-img @click="goToPost(post._id)" height="30vh" :src="post.imageUrl"></v-img>
             <v-card-text>{{ post.title }}</v-card-text>
           </v-card>
         </v-flex>
@@ -169,6 +169,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import { mapGetters } from "vuex";
 
 export default {
@@ -204,6 +205,12 @@ export default {
     this.handleGetUserPosts();
   },
   methods: {
+    goToPost(id) {
+      this.$router.push(`/posts/${id}`);
+    },
+    formatJoinDate(date) {
+      return moment(new Date(date)).format('ll');
+    },
     handleGetUserPosts() {
       this.$store.dispatch("getUserPosts", {
         userId: this.user._id
